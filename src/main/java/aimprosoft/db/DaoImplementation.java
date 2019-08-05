@@ -1,7 +1,9 @@
 package aimprosoft.db;
+
 import aimprosoft.entities.Department;
 import aimprosoft.entities.Worker;
 import aimprosoft.exceptions.DBException;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +25,9 @@ public final class DaoImplementation implements DaoInterface {
 
     public List<Department> getAllDepartments() throws DBException {
         List<Department> departments = new ArrayList<>();
-        try (Statement statement = connection.createStatement();
+        try (Connection connection = ConnectionPool.getConnection();
+             Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(RequestDB.SELECT_ALL_DEPARTMENTS)) {
-            connection = ConnectionPool.getConnection();
             while (resultSet.next()) {
                 departments.add(new Department(
                         resultSet.getInt("department_id"),
@@ -42,9 +44,9 @@ public final class DaoImplementation implements DaoInterface {
 
     public List<Worker> getAllWorkersFromDepartment(int departmentId) throws DBException {
         List<Worker> workers = new ArrayList<>();
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(RequestDB.SELECT_ALL_WORKERS_FROM_DEPARTMENT)) {
-            connection = ConnectionPool.getConnection();
             preparedStatement.setInt(1, departmentId);
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getResultSet();
@@ -66,8 +68,8 @@ public final class DaoImplementation implements DaoInterface {
 
 
     public void addWorker(Worker worker) throws DBException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(RequestDB.ADD_WORKER)) {
-            connection = ConnectionPool.getConnection();
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(RequestDB.ADD_WORKER)) {
             preparedStatement.setInt(1, worker.getId());
             preparedStatement.setString(2, worker.getLogin());
             preparedStatement.setString(3, worker.getMail());
@@ -84,9 +86,9 @@ public final class DaoImplementation implements DaoInterface {
 
     public void addDepartment(Department department) throws DBException {
 
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(RequestDB.ADD_DEPARTMENT)) {
-            connection = ConnectionPool.getConnection();
             preparedStatement.setInt(1, department.getId());
             preparedStatement.setString(2, department.getName());
             preparedStatement.executeUpdate();
@@ -122,9 +124,9 @@ public final class DaoImplementation implements DaoInterface {
     }
 
     public void updateWorkerDepartment(Worker worker) throws DBException {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(RequestDB.UPDATE_WORKER_DEPARTMENT)) {
-            connection = ConnectionPool.getConnection();
             preparedStatement.setInt(2, worker.getId());
             preparedStatement.setInt(1, worker.getDepartment_id());
             preparedStatement.executeUpdate();
@@ -135,11 +137,10 @@ public final class DaoImplementation implements DaoInterface {
         }
     }
 
-
     public void updateWorkerLogin(Worker worker) throws DBException {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(RequestDB.UPDATE_WORKER_LOGIN)) {
-            connection = ConnectionPool.getConnection();
             preparedStatement.setInt(2, worker.getId());
             preparedStatement.setString(1, worker.getLogin());
 
@@ -153,8 +154,8 @@ public final class DaoImplementation implements DaoInterface {
 
 
     public void updateDepartment(Department department) throws DBException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(RequestDB.UPDATE_DEPARTMENT)) {
-            connection = ConnectionPool.getConnection();
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(RequestDB.UPDATE_DEPARTMENT)) {
             preparedStatement.setInt(2, department.getId());
             preparedStatement.setString(1, department.getName());
             preparedStatement.executeUpdate();
